@@ -76,14 +76,15 @@ pst sync [collection-name...] [--global] [--update]
 
 ## Commands Overview
 
-| Command                               | Description                                                    |
-|---------------------------------------|----------------------------------------------------------------|
-| `share <name> [path(s)...]`           | Add files or folders to a named collection.                    |
-| `update <name> [target-path]`         | Pull collection updates to a target project.                   |
-| `sync [name...] [--global] [--update]`| Sync collections in the current directory or globally.         |
-| `status [name...] [--files-only]`     | Show tracked files and folders in each collection.             |
-| `add <name> [path(s)...]`             | Add more files or folders to an existing collection.           |
-| `remove <name> <path>`                | Remove a file or folder from a collection.                     |
+| Status | Command                                        | Description                                                       |
+|--------|------------------------------------------------|-------------------------------------------------------------------|
+|    90% | `init <name> [path(s)...] [--target=<target>]` | Add files or folders to a named collection.                       |
+|    90% | `require <name> [--target=<target>]`           | Pull collection updates to a current directory or target project. |
+|     0% | `push [name...] [--target=<target>]`           | Push new changes. If no collection names are provided it will scan for collections matching the current dir or target dir if provided  |
+|     0% | `sync [name...] [--target=<target>] [--global] [--update]`         | Sync collections in the current directory or globally.            |
+|     0% | `status [name...] [--target=<target>] [--files-only]`              | Show tracked files and folders in each collection.                |
+|     0% | `add <name> [path(s)...]`                      | Add more files or folders to an existing collection.              |
+|     0% | `remove <name> <path>`                         | Remove a file or folder from a collection.                        |
 
 ---
 
