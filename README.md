@@ -6,6 +6,12 @@
 
 Inspired by issues like the left-pad incident in JavaScript, `pst` offers a way to reuse code without risking external dependency failures. Instead of pulling code from an external repository or library, `pst` keeps everything local, ensuring that your projects won’t break if a dependency becomes unavailable or undergoes unexpected changes.
 
+### Scope and Limitations
+`pst` is designed to be a local utility. It operates entirely on the same device, like cp or rsync, and isn’t intended to replace package managers or manage complex dependency relationships. For example:
+
+- **Portability**: Since `pst` tracks files with absolute paths, each user or device must configure pst with the same directory structure to use shared collections across systems. The configuration files are stored locally at ~/.config/project-sync-tool/.
+- **Compatibility and Testing**: `pst` only copies and updates files—it doesn’t check code compatibility between projects. Ensuring compatibility or running tests after syncing is left to the user.
+
 ---
 
 ## How It Works
@@ -70,14 +76,14 @@ pst sync [collection-name...] [--global] [--update]
 
 ## Commands Overview
 
-| Command                              | Description                                                    |
-|--------------------------------------|----------------------------------------------------------------|
-| `share <name> [path(s)...]`          | Add files or folders to a named collection.                    |
-| `update <name> [target-path]`        | Pull collection updates to a target project.                   |
+| Command                               | Description                                                    |
+|---------------------------------------|----------------------------------------------------------------|
+| `share <name> [path(s)...]`           | Add files or folders to a named collection.                    |
+| `update <name> [target-path]`         | Pull collection updates to a target project.                   |
 | `sync [name...] [--global] [--update]`| Sync collections in the current directory or globally.         |
-| `status`                             | Show tracked files and folders in each collection.             |
-| `add <name> [path(s)...]`            | Add more files or folders to an existing collection.           |
-| `remove <name> <path>`               | Remove a file or folder from a collection.                     |
+| `status [name...] [--files-only]`     | Show tracked files and folders in each collection.             |
+| `add <name> [path(s)...]`             | Add more files or folders to an existing collection.           |
+| `remove <name> <path>`                | Remove a file or folder from a collection.                     |
 
 ---
 
