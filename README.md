@@ -21,28 +21,28 @@ Inspired by issues like the left-pad incident in JavaScript, `pst` offers a way 
 To reuse a file or folder across projects, use the `share` command to add it to a named collection. This creates a copy of the specified files or folders in a central location on your system (`~/.config/project-sync-tool/collections/<collection-name>`), which becomes the source for syncing code to and from projects.
 
 ```sh
-pst share <collection-name> [path/to/file/or/folder...]
+pst init <collection-name> [path/to/file/or/folder...]
 ```
 
 - **Example**: Adding multiple files to a collection called `common-utils`:
 
   ```sh
-  pst share common-utils /projectA/utils.php /projectB/helpers.php
+  pst init common-utils /projectA/utils.php /projectB/helpers.php
   ```
 
 - If no path is specified, the current directory is added to the collection.
 
-### Pulling Updates from a Collection
-To update your project with the latest code from a collection, use the `update` command. This pulls changes from the central copy of each file or folder in the collection and applies them to the target path.
+### Requiring Files from a Collection
+To update your project with the latest code from a collection, use the `require` command. This pulls changes from the central copy of each file or folder in the collection and applies them to the target path.
 
 ```sh
-pst update <collection-name> [target-path]
+pst require <collection-name> [target-path]
 ```
 
 - **Example**: Updating the `common-utils` collection in `projectC`:
 
   ```sh
-  pst update common-utils /path/to/projectC
+  pst require common-utils /path/to/projectC
   ```
 
 - If no target path is specified, `update` applies to the current directory.
@@ -79,11 +79,11 @@ pst sync [collection-name...] [--global] [--update]
 
 | Status | Command                                        | Description                                                       |
 |--------|------------------------------------------------|-------------------------------------------------------------------|
-|    90% | `init <name> [path(s)...] [--target=<target>]` | Add files or folders to a named collection.                       |
-|    30% | `require <name> [--target=<target>]`           | Pull collection updates to a current directory or target project. |
-|    90% | `push [name...] [--target=<target>]`           | Push new changes. If no collection names are provided it will scan for collections matching the current dir or target dir if provided  |
-|     0% | `sync [name...] [--target=<target>] [--global] [--update]`         | Sync collections in the current directory or globally.            |
-|     0% | `status [name...] [--target=<target>] [--files-only]`              | Show tracked files and folders in each collection.                |
+|    90% | `init <name> [path(s)...]` | Add files or folders to a named collection.                       |
+|    30% | `require <name>`           | Pull collection updates to a current directory or target project. |
+|    90% | `push [name...]`           | Push new changes. If no collection names are provided it will scan for collections matching the current dir or target dir if provided  |
+|     0% | `sync [name...] [--global] [--update]`         | Sync collections in the current directory or globally.            |
+|     0% | `status [name...] [--files-only]`              | Show tracked files and folders in each collection.                |
 |     0% | `add <name> [path(s)...]`                      | Add more files or folders to an existing collection.              |
 |     0% | `remove <name> <path>`                         | Remove a file or folder from a collection.                        |
 
