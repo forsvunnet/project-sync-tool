@@ -1,5 +1,6 @@
 # Project Sync Tool (`pst`)
 
+
 `pst` is a tool for reusing code across multiple projects on a local system, regardless of language or project type. It allows you to share specific files or folders between projects locally, without submodules, extra repositories, or package dependencies. With `pst`, you control code consistency without relying on external sources.
 
 ### Why Use This Tool?
