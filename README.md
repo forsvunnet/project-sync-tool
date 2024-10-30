@@ -96,7 +96,6 @@ pst sync [collection-name...] [--global] [--update]
 3. Build the tool:
 
    ```sh
-   go build -o pst
+   go build -o pst && mv pst /usr/local/bin/
    ```
 
-4. Move `pst` to your PATH.

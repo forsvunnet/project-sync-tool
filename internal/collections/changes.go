@@ -34,7 +34,6 @@ func CheckForChanges(collectionName, projectPath string) (ChangeStatus, error) {
         // If the project file doesn’t exist, mark it as a new local file
         projectInfo, err := os.Stat(projectFilePath)
         if os.IsNotExist(err) {
-            status.LocalNewer = append(status.LocalNewer, projectFilePath)
             continue
         } else if err != nil {
             return ChangeStatus{}, fmt.Errorf("failed to stat project file %s: %w", projectFilePath, err)

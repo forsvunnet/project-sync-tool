@@ -18,38 +18,33 @@ func GetCollectionPath(collectionName string) string {
     return filepath.Join(os.Getenv("HOME"), ".config", "project-sync-tool", "collections", collectionName)
 }
 
-// AddToCollection adds files or folders to a collection, overwriting existing files if `force` is true.
 func AddToCollection(collectionName string, paths []string, force bool) error {
     collectionPath := GetCollectionPath(collectionName)
 
-
-    // Check if the collection already exists
-    if _, err := os.Stat(collectionPath); err == nil && !force {
-        return fmt.Errorf("collection %s already exists; use --force to overwrite", collectionName)
-    }
-
-	if force {
+    // Clear and recreate collection directory if force is specified
+    if _, err := os.Stat(collectionPath); err == nil && force {
         if err := os.RemoveAll(collectionPath); err != nil {
             return fmt.Errorf("failed to clear collection directory: %w", err)
         }
-        if err := os.MkdirAll(collectionPath, os.ModePerm); err != nil {
-            return fmt.Errorf("failed to recreate collection directory: %w", err)
-        }
-    } else {
-        // Create the collection directory if it doesn't exist
-        if err := os.MkdirAll(collectionPath, os.ModePerm); err != nil {
-            return fmt.Errorf("failed to create collection directory: %w", err)
-        }
+    }
+    if err := os.MkdirAll(collectionPath, os.ModePerm); err != nil {
+        return fmt.Errorf("failed to create collection directory: %w", err)
     }
 
-    // Copy each specified path into the collection
+    // Copy each specified path into the collection, preserving relative directory structure
     for _, path := range paths {
-        if err := copyToCollection(path, collectionPath); err != nil {
+        relPath, err := filepath.Rel(".", path) // relative to the current directory
+        if err != nil {
+            return fmt.Errorf("failed to calculate relative path for %s: %w", path, err)
+        }
+
+        destPath := filepath.Join(collectionPath, relPath)
+        if err := copyToCollection(path, destPath); err != nil {
             return fmt.Errorf("failed to add %s to collection: %w", path, err)
         }
     }
 
-    // Save collection metadata to a YAML file
+    // Save collection metadata
     if err := saveCollectionMeta(collectionName); err != nil {
         return fmt.Errorf("failed to save collection metadata: %w", err)
     }
@@ -125,14 +120,19 @@ func saveCollectionMeta(collectionName string) error {
     return os.WriteFile(metaFile, data, 0644)
 }
 
-// copyToCollection copies files or directories to the collection path
-func copyToCollection(srcPath, destDir string) error {
+
+// copyToCollection copies files or directories to the collection path, creating directories as needed.
+func copyToCollection(srcPath, destPath string) error {
+    // Ensure the destination directory exists
+    destDir := filepath.Dir(destPath)
+    if err := os.MkdirAll(destDir, os.ModePerm); err != nil {
+        return fmt.Errorf("failed to create destination directory %s: %w", destDir, err)
+    }
+
     srcInfo, err := os.Stat(srcPath)
     if err != nil {
         return fmt.Errorf("could not access path %s: %w", srcPath, err)
     }
-
-    destPath := filepath.Join(destDir, filepath.Base(srcPath))
 
     if srcInfo.IsDir() {
         return copyDirectory(srcPath, destPath)
@@ -160,13 +160,13 @@ func CopyFile(src, dst string) error {
     return out.Close()
 }
 
-// copyDirectory recursively copies a directory from src to dst
 func copyDirectory(src, dst string) error {
     return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
         if err != nil {
             return err
         }
 
+        // Calculate the relative path and create target path
         relPath, err := filepath.Rel(src, path)
         if err != nil {
             return err
@@ -174,14 +174,14 @@ func copyDirectory(src, dst string) error {
         targetPath := filepath.Join(dst, relPath)
 
         if info.IsDir() {
+            // Create the target directory if it's a directory
             return os.MkdirAll(targetPath, info.Mode())
         }
 
+        // Copy file if it's a regular file
         return CopyFile(path, targetPath)
     })
 }
-
-
 
 // RequireCollection requires all files from the collection directory into the current working directory
 // and adds the current working directory to the metadata if it's not already there.
@@ -211,23 +211,28 @@ func RequireCollection(collectionName string, cwd string) error {
     return nil
 }
 
-// copyCollectionFilesToTarget copies all files in collectionPath to targetPath (cwd).
 func copyCollectionFilesToTarget(collectionPath, targetPath string) error {
-    files, err := os.ReadDir(collectionPath)
-    if err != nil {
-        return fmt.Errorf("failed to read collection directory: %w", err)
-    }
-
-    for _, file := range files {
-        srcFilePath := filepath.Join(collectionPath, file.Name())
-        destFilePath := filepath.Join(targetPath, file.Name())
-        if err := copyToTarget(srcFilePath, destFilePath); err != nil {
-            return fmt.Errorf("failed to copy %s to %s: %w", srcFilePath, destFilePath, err)
+    return filepath.Walk(collectionPath, func(path string, info os.FileInfo, err error) error {
+        if err != nil {
+            return err
         }
-    }
-    return nil
-}
 
+        // Calculate the relative path from the collection base to the current file
+        relPath, err := filepath.Rel(collectionPath, path)
+        if err != nil {
+            return fmt.Errorf("failed to calculate relative path: %w", err)
+        }
+        destPath := filepath.Join(targetPath, relPath)
+
+        if info.IsDir() {
+            // Create the directory in the target path
+            return os.MkdirAll(destPath, info.Mode())
+        }
+
+        // Copy files using CopyFile
+        return CopyFile(path, destPath)
+    })
+}
 
 // copyToTarget copies a single file from srcPath to destPath, creating directories as needed.
 func copyToTarget(srcPath, destPath string) error {
