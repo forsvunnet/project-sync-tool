@@ -8,15 +8,6 @@ Inspired by issues like the left-pad incident in JavaScript, `pst` offers a way 
 
 ---
 
-## Features
-
-- **Local Syncing**: Share code across projects on your device—no network dependencies.
-- **Checksum-Based Updates**: Detects file changes using checksums to track version consistency.
-- **Named Collections**: Organize files or folders into collections for flexible syncing.
-- **One-Command Sync**: Sync collections across projects with a single command, and check status across all collections.
-
----
-
 ## How It Works
 
 ### Adding Files to a Collection
